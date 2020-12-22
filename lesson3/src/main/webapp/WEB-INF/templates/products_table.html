@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Список товаров</h1>
+    <h3 th:text="'Всего товаров: ' + ${products.size()}"></h3>
+
+    <table th:if="${products.size()} > 0" class="table">
+        <thead>
+        <tr>
+            <th scope="col">Артикул</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Стоимость</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+            <th th:text="${product.id}" scope="row"></th>
+            <td th:text="${product.title}"></td>
+            <td th:text=${product.cost}></td>
+            <td><a class="btn btn-danger" th:href="@{'/products/del/' + ${product.id}}"/>Удалить</td>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+    <h1>Добавить новый товар</h1>
+    <form method="post" th:action="@{'/products/add'}">
+        <div class="row">
+            <div class="col">
+                <input type="number" class="form-control" placeholder="Артикул" name="id" >
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Наименование" name="title">
+            </div>
+            <div class="col">
+                <input type="number" step="any" class="form-control" placeholder="Стоимость" name="cost">
+            </div>
+            <button type="submit" class="btn btn-outline-success">Добавить</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
