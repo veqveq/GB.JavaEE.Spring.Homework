@@ -1,50 +1,45 @@
 package com.veqveq.lesson7.controllers;
 
 import com.veqveq.lesson7.models.Product;
-import com.veqveq.lesson7.repositories.ProductRepository;
+import com.veqveq.lesson7.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    @GetMapping("/find_all")
-    public List<Product> findAll(){
-        return productRepository.findAll();
-    }
-
-    @GetMapping("/find/{id}")
-    public Product findById(@PathVariable Long id){
-        return productRepository.findById(id).get();
+    @GetMapping("/find")
+    private Collection<Product> find(@RequestParam(name = "min", required = false) Integer minCost,
+                                    @RequestParam(name = "max", required = false) Integer maxCost,
+                                    @RequestParam(name = "id", required = false) Long id) {
+        if (id != null) {
+            return Collections.singleton(productService.findById(id));
+        } else {
+            if (minCost != null && maxCost != null) {
+                return productService.findBetween(minCost, maxCost);
+            } else if (minCost != null && maxCost == null) {
+                return productService.findExpensive(minCost);
+            } else if (minCost == null && maxCost != null) {
+                return productService.findCheaper(maxCost);
+            } else {
+                return productService.findAll();
+            }
+        }
     }
 
     @GetMapping("/delete/{id}")
-    public void deleteByID(@PathVariable Long id){
-        productRepository.deleteById(id);
+    private void delete(@PathVariable Long id) {
+        productService.deleteById(id);
     }
 
-    @GetMapping ("/expensive/{minCost}")
-    public List<Product> findExpensive(@PathVariable int minCost){
-        return productRepository.findAllByCostGreaterThan(minCost);
-    }
-
-    @GetMapping ("/cheaper/{maxCost}")
-    public List<Product> findCheaper(@PathVariable int maxCost){
-        return productRepository.findAllByCostLessThan(maxCost);
-    }
-
-    @GetMapping ("/between")
-    public List<Product> findBetween(@RequestParam(name = "min") int minCost, @RequestParam(name = "max") int maxCost){
-        return productRepository.findAllByCostBetween(minCost, maxCost);
-    }
-
-    @PostMapping ("/save")
-    public void save(@RequestParam Long id, @RequestParam String title, @RequestParam int cost){
-        productRepository.saveAndFlush(new Product(id,title,cost));
+    @PostMapping("/save")
+    private void save(@RequestParam Long id, @RequestParam String title, @RequestParam int cost) {
+        productService.save(id,title,cost);
     }
 }
