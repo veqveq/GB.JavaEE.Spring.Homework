@@ -1,0 +1,10 @@
+server:
+  port: 8389
+spring:
+  application:
+    name: front-service
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8289/eureka}
+    fetch-registry: true

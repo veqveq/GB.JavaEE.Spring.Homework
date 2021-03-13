@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: zuul-server
+server:
+  port: 8189
+  servlet:
+    context-path: /app
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8289/eureka}
+zuul:
+  routes:
+    rest-service: /products
+    front-service: /**
+  sensitiveHeaders: Cookie, Set-Cookie
