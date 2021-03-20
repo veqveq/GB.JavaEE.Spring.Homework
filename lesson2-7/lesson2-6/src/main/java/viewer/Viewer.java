@@ -5,18 +5,16 @@ import models.MyCommand;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Viewer {
 
-    private static final Map<String, String> subscribes = new HashMap<>();
+    private static List<String> subscribes;
     private static String queueName;
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
+        subscribes = new ArrayList<>();
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
 
@@ -45,9 +43,9 @@ public class Viewer {
 
     private static void subscribe(Channel channel, List<String> tags) throws IOException {
         for (String tag : tags) {
-            if (!subscribes.containsKey(tag)) {
+            if (!subscribes.contains(tag)) {
                 channel.exchangeDeclare(tag, BuiltinExchangeType.DIRECT);
-                subscribes.put(tag, queueName);
+                subscribes.add(tag);
                 channel.queueBind(queueName, tag, tag);
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
@@ -64,8 +62,8 @@ public class Viewer {
 
     private static void unsubscribe(Channel channel, List<String> tags) throws IOException {
         for (String tag : tags) {
-            if (subscribes.containsKey(tag)) {
-                channel.queueUnbind(subscribes.get(tag), tag, tag);
+            if (subscribes.contains(tag)) {
+                channel.queueUnbind(queueName, tag, tag);
                 subscribes.remove(tag);
                 System.out.println("You are unsubscribed in tag " + tag);
             } else {
